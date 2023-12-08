@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://bm5uk7w1gsi26"]
+[gd_scene load_steps=3 format=3 uid="uid://bm5uk7w1gsi26"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_ibk4f"]
+[ext_resource type="Texture2D" uid="uid://dyuhudkw0wyn3" path="res://MS Paint _ Microsoft Paint Online.png" id="2_i6e40"]
 
 [node name="root" type="Node"]
 script = ExtResource("1_ibk4f")
@@ -25,4 +26,8 @@ position = Vector2(-50, -50)
 [node name="Timer" type="Timer" parent="."]
 wait_time = 0.707
 
-[connection signal="timeout" from="Timer" to="." method="move"]
+[node name="PointLight2D" type="PointLight2D" parent="."]
+position = Vector2(90, 810)
+scale = Vector2(0.313953, 0.304878)
+blend_mode = 2
+texture = ExtResource("2_i6e40")

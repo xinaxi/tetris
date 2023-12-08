@@ -8,24 +8,23 @@ script = ExtResource("1_dbgrc")
 
 [node name="b3" type="TextureRect" parent="."]
 offset_left = -40.0
-offset_top = 40.0
-offset_bottom = 80.0
+offset_bottom = 40.0
 texture = ExtResource("2_xfv3i")
 
 [node name="b2" type="TextureRect" parent="."]
 offset_left = 40.0
+offset_top = -40.0
 offset_right = 80.0
-offset_bottom = 40.0
 texture = ExtResource("2_xfv3i")
 metadata/_edit_use_anchors_ = true
 
 [node name="b1" type="TextureRect" parent="."]
 offset_left = -40.0
-offset_right = -40.0
+offset_top = -40.0
 texture = ExtResource("2_xfv3i")
 
 [node name="center" type="TextureRect" parent="."]
+offset_top = -40.0
 offset_right = 40.0
-offset_bottom = 40.0
 size_flags_vertical = 8
 texture = ExtResource("2_xfv3i")
