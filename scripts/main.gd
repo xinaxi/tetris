@@ -1,12 +1,8 @@
 extends Node
 
-var piece_scene = preload("res://scenes/piece.tscn")
-var size = 40
+var piece_class = preload("res://scripts/piece.gd")
+var size = Piece.size
 var current = null
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -15,20 +11,9 @@ func _process(delta):
 
 func _input(event):
 	if event.is_action_pressed("start"):
-#		make_new()
-		for i in range(7):
-			current = piece_scene.instantiate()
-			current.type = i
-			current.rotation += PI/2
-			if i%2 == 0:
-				current.position = Vector2(4*size,4*size*i/2)
-			else:
-				current.position = Vector2(8*size,4*size*i/2)
-			$viewport.add_child(current)
-			var pl = $PointLight2D.duplicate()
-			$viewport.add_child(pl)
-			pl.set_global_position(current.get_child(0).get_global_position())
-			
+		InputMap.erase_action("start")
+		make_new()
+		
 
 
 func make_static():
@@ -39,12 +24,16 @@ func make_static():
 		child.set_global_position(pos)
 	current.queue_free()
 	make_new()
-		
+
+
 func make_new():
-	current = piece_scene.instantiate()
-#	current.type = randi_range(0,6)
-	current.position = Vector2(4*size,0)
+	current = piece_class.create(randi_range(0,6))
+	current.position = Vector2(9*size/2,size/2)
 	$viewport.add_child(current)
+	var node = $PointLight2D.duplicate()
+	current.add_child(node)
+	node.set_global_position(current.get_global_position())
+	
 	$Timer.timeout.connect(current.move)
 	$Timer.start()
 	current.stopped.connect(make_static)
