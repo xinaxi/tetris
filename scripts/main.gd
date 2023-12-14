@@ -4,39 +4,49 @@ var piece_class = preload("res://scripts/piece.gd")
 var size = Piece.size
 var current = null
 
+var rows = []
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
+func _ready():
+	rows.resize(20)
+	rows.fill(0)
+	make_new()
 
 func _input(event):
-	if event.is_action_pressed("start"):
-		InputMap.erase_action("start")
-		make_new()
-		
-
+	if event.is_action_pressed("restart"):
+		get_tree().reload_current_scene()
 
 func make_static():
 	for child in current.get_children():
-		var pos = child.get_global_position()
-		current.remove_child(child)
-		$viewport/static.add_child(child)
-		child.set_global_position(pos)
+		child.reparent($viewport/static)
+		rows[child.get_global_position().y / size - 1 as int] += 1
 	current.queue_free()
+	check()
 	make_new()
-
 
 func make_new():
 	current = piece_class.create(randi_range(0,6))
 	current.position = Vector2(9*size/2,size/2)
 	$viewport.add_child(current)
-	var node = $PointLight2D.duplicate()
-	current.add_child(node)
-	node.set_global_position(current.get_global_position())
-	
 	$Timer.timeout.connect(current.move)
 	$Timer.start()
 	current.stopped.connect(make_static)
+
+func check():
+	for i in rows.size():
+		if rows[i] == 10:
+			delete_row(i)
+
+func delete_row(num):
+	var y = num*size + size/2
+	for child in $viewport/static.get_children():
+		if child.position.y < y:
+			child.position.y += size
+		elif child.position.y == y:
+			child.queue_free()
+	for i in range(num,0,-1):
+		rows[i] = rows[i-1]
+
+
 
 
 

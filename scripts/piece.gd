@@ -4,7 +4,7 @@ extends Node2D
 signal stopped
 enum forms {CUBE, LINE, L, Z, S, J, T}
 
-static var arr = [
+static var scripts = [
 	preload("res://scripts/cube.gd"), 
 	preload("res://scripts/line.gd"),
 	preload("res://scripts/L.gd"),
@@ -19,7 +19,6 @@ var block_texture = preload("res://block.png")
 var type: int
 var color: String
 static var size = 40
-var rotation_count = 0
 
 #edges in global coordinates
 #x is left edge and y is right
@@ -27,8 +26,7 @@ var bound: Vector2
 var down
 
 static func create(type):
-	return arr[type].new()
-		
+	return scripts[type].new()
 
 func _init():
 	for i in range(4):
@@ -38,14 +36,10 @@ func _init():
 		add_child(node)
 
 func _ready():
-	bound.x = get_parent().get_global_position().x + size/2
-	bound.y = bound.x + get_parent().get_size().x - size/2
+	bound.x = get_parent().get_global_position().x
+	bound.y = bound.x + get_parent().get_size().x
 	down = get_parent().get_global_position().y
 	down += get_parent().get_size().y
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
 
 func _input(event):
 	if event.is_action_pressed("rotate"):
@@ -62,8 +56,11 @@ func _input(event):
 		while(is_there_down()):
 			move()
 
+#reset rotation after every round so roundoff is not accumulated
 func rotate_piece():
 	rotation += PI/2
+	if is_equal_approx(rotation , 2*PI):
+		rotation = 0
 
 func move():
 	if is_there_down():
@@ -75,7 +72,7 @@ func move():
 func is_there_left():
 	for block in get_children():
 		var pos = block.get_global_position()
-		if pos.x <= bound.x:
+		if pos.x <= bound.x + size/2:
 			return false
 		for child in get_parent().find_child("static").get_children():
 			var pos2 = child.get_global_position() 
@@ -86,7 +83,7 @@ func is_there_left():
 func is_there_right():
 	for block in get_children():
 		var pos = block.get_global_position()
-		if pos.x >= bound.y - size:
+		if pos.x >= bound.y - size/2:
 			return false
 		for child in get_parent().find_child("static").get_children():
 			var pos2 = child.get_global_position() 
@@ -97,12 +94,12 @@ func is_there_right():
 func is_there_down():
 	for block in get_children():
 		var pos = block.get_global_position()
-		if pos.y + size >= down:
+		if pos.y + size > down:
 			return false
 		for child in get_parent().find_child("static").get_children():
-			var pos2 = child.get_global_position() 
+			var pos2 = child.get_global_position()
 			if pos2.x == pos.x and pos2.y == pos.y + size:
-				return false
+					return false
 	return true
 
 
