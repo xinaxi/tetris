@@ -81,10 +81,66 @@ func _process(delta):
 		move()
 
 #reset rotation after every round so roundoff is not accumulated
-func rotate_piece():
-	rotation += PI/2
+func rotate_piece_side(side = 1):
+	rotation += PI/2 * side
 	if is_equal_approx(rotation , 2*PI):
 		rotation = 0
+
+func rotate_piece():
+	var pos = position
+	rotate_piece_side(1)
+	
+	#we can't rotate if we are too close to the floor
+	#but we are not gonna go up, so there will be no loop
+	position.y -= size
+	if not is_there_down():
+		rotate_piece_side(-1)
+		position = pos
+		return
+	position.y += size
+	
+	#we also check if we violate the boundaries
+	#and if so - trying to slide sideways
+	if outside_left():
+		if is_there_right():
+			position.x += size
+			if outside_left():
+				if is_there_right():
+					position.x += size
+					return
+			else:
+				return
+	else:
+		if outside_right():
+			if is_there_left():
+				position.x -= size
+				if outside_right():
+					if is_there_left():
+						position.x -= size
+						return
+				else:
+					return
+		else:
+			return
+	rotate_piece_side(-1)
+	position = pos
+	return
+
+func outside_left():
+	var result = true
+	position.x += size
+	if is_there_left():
+		result = false
+	position.x -= size
+	return result
+
+func outside_right():
+	var result = true
+	position.x -= size
+	if is_there_right():
+		result = false
+	position.x += size
+	return result
 
 func move():
 	if is_there_down():
