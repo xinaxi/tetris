@@ -20,6 +20,13 @@ var type: int
 var color: String
 static var size = 40
 
+#variables to control movement
+#if the player presses a key for a long, we should move the piece continuously
+#(with an initial delay though)
+var wait = 0.08
+var delay = -0.4
+var elapsed = delay
+
 #edges in global coordinates
 #x is left edge and y is right
 var bound: Vector2
@@ -42,19 +49,36 @@ func _ready():
 	down += get_parent().get_size().y
 
 func _input(event):
-	if event.is_action_pressed("rotate"):
-		rotate_piece()
 	if event.is_action_pressed("left"):
 		if is_there_left():
 			position.x -= size
+			elapsed = delay
 	if event.is_action_pressed("right"):
 		if is_there_right():
 			position.x += size
+			elapsed = delay
 	if event.is_action_pressed("down"):
 		move()
+		elapsed = delay
+	if event.is_action_pressed("rotate"):
+		rotate_piece()
 	if event.is_action_pressed("fast_down"):
 		while(is_there_down()):
 			move()
+
+func _process(delta):
+	elapsed += delta
+	if elapsed < wait:
+		return
+	elapsed = 0
+	if Input.is_action_pressed("left"):
+		if is_there_left():
+			position.x -= size
+	if Input.is_action_pressed("right"):
+		if is_there_right():
+			position.x += size
+	if Input.is_action_pressed("down"):
+		move()
 
 #reset rotation after every round so roundoff is not accumulated
 func rotate_piece():
