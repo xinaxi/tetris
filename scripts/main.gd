@@ -4,6 +4,7 @@ var piece_class = preload("res://scripts/piece.gd")
 var size = Piece.size
 var current = null
 
+var spawn_point = Vector2(9.0/2, 1.0/2)
 var rows = []
 
 func _ready():
@@ -20,18 +21,21 @@ func make_static():
 		child.reparent($viewport/static)
 		rows[child.get_global_position().y / size - 1 as int] += 1
 	current.queue_free()
-	check()
+	delete_completed()
 	make_new()
 
 func make_new():
 	current = piece_class.create(randi_range(0,6))
-	current.position = Vector2(9*size/2,size/2)
+	current.position = spawn_point * size
 	$viewport.add_child(current)
+	if not current.is_there_down():
+		game_over()
+		return
 	$Timer.timeout.connect(current.move)
 	$Timer.start()
 	current.stopped.connect(make_static)
 
-func check():
+func delete_completed():
 	for i in rows.size():
 		if rows[i] == 10:
 			delete_row(i)
@@ -46,7 +50,7 @@ func delete_row(num):
 	for i in range(num,0,-1):
 		rows[i] = rows[i-1]
 
-
-
+func game_over():
+	$"game over".visible = true
 
 

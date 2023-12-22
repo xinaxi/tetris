@@ -8,4 +8,7 @@ func _init():
 	get_child(1).position.y -= size
 	get_child(3).position.x -= size
 
-
+func _ready():
+	super()
+	position.y += 2*size
+	position.x += size
